@@ -89,7 +89,10 @@
         {{- $onPageTags := $.Page.Params.tags }}
         {{- $slicedTags := ($value.ByCount | first $tagsLimit) }}
         {{- range $slicedTags }}
-        <a href='{{ absLangURL $key }}/{{ (replace .Name "#" "%23") | urlize }}/' class="post_tag button button_translucent" title="{{ .Name }}">
+        {{/* Use .Page.RelPermalink so sidebar URL matches Hugo's actual taxonomy term page URL.
+             Hugo's URLizer and the `urlize` filter diverge on chars like `&` (`Foo & Bar` →
+             `foo--bar` vs `foo-bar`), which silently 404s every internal taxonomy nav link. */}}
+        <a href='{{ with .Page }}{{ .RelPermalink }}{{ else }}{{ absLangURL $key }}/{{ (replace $.Name "#" "%23") | urlize }}/{{ end }}' class="post_tag button button_translucent" title="{{ .Name }}">
           {{ upper .Name }}
           <span class="button_tally">{{ .Count }}</span>
         </a>
@@ -102,7 +105,7 @@
           <div class="tags_list">
             {{- range $value.Alphabetical }}
             {{ $tagsInfo.Add "tagsInfo" (slice .Name .Count)}}
-            <a href='{{ absLangURL $key }}/{{ (replace .Name "#" "%23") | urlize }}/' class=" post_tag button button_translucent" data-position={{ .Count }} title="{{ .Name }}">
+            <a href='{{ with .Page }}{{ .RelPermalink }}{{ else }}{{ absLangURL $key }}/{{ (replace $.Name "#" "%23") | urlize }}/{{ end }}' class=" post_tag button button_translucent" data-position={{ .Count }} title="{{ .Name }}">
               {{- upper .Name -}}
               <span class="button_tally">{{ .Count }}</span>
             </a>
