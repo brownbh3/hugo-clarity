@@ -1,0 +1,40 @@
+{{- /* brand-box — Fleet Brand Data Pipeline (v2.4, Policy Decision #11).
+       Reads hugo.Data.brands[slug] (per-site brands.json, built from brands.db).
+       Uniform base + per-cluster CSS variant. logo_url null → name + description
+       only. affiliate_url + Site.Params.affiliate → "Shop X →" sponsored CTA. */ -}}
+{{- $slug := .Get "slug" -}}
+{{- $b := index hugo.Data.brands $slug -}}
+{{- if $b -}}
+{{- if not (.Page.Scratch.Get "brandbox_css") -}}
+<style>
+.brand-box{border:1px solid #e2e2e2;border-left-width:4px;border-radius:8px;padding:1rem;margin:1.25rem 0;display:flex;gap:1rem;align-items:flex-start;font-family:system-ui,-apple-system,sans-serif}
+.brand-box__logo{flex:0 0 auto;width:64px;height:64px;object-fit:contain;background:#fafafa;border-radius:6px}
+.brand-box__body{flex:1 1 auto;min-width:0}
+.brand-box__name{font-weight:600;font-size:1.1rem;margin:0 0 .25rem}
+.brand-box__name a{text-decoration:none}
+.brand-box__fn{margin:.25rem 0;color:#333;line-height:1.45}
+.brand-box__tags{margin-top:.5rem}
+.brand-box__tag{display:inline-block;background:#f0f0f0;border-radius:999px;padding:.1rem .6rem;font-size:.75rem;margin:.1rem .25rem .1rem 0;color:#444}
+.brand-box__cta{display:inline-block;margin-top:.6rem;font-weight:600;text-decoration:none}
+.brand-box--catalog_retailer{border-left-color:#2b6cb0}
+.brand-box--credit_card_issuer,.brand-box--co_branded_card{border-left-color:#6b46c1}
+.brand-box--privacy_org,.brand-box--data_broker{border-left-color:#2f855a}
+.brand-box--hosting_provider{border-left-color:#c05621}
+.brand-box--isp_broadband{border-left-color:#319795}
+@media(max-width:480px){.brand-box{flex-direction:column}}
+</style>
+{{- .Page.Scratch.Set "brandbox_css" true -}}
+{{- end -}}
+<div class="brand-box brand-box--{{ $b.brand_type_primary }}">
+  {{- with $b.logo_url }}<img class="brand-box__logo" src="{{ . }}" alt="{{ $b.name }} logo" loading="lazy">{{ end -}}
+  <div class="brand-box__body">
+    <p class="brand-box__name"><a href="{{ $b.url }}" rel="noopener">{{ $b.name }}</a></p>
+    {{- $fn := $b.function | default $b.og_description -}}
+    {{- with $fn }}<p class="brand-box__fn">{{ . }}</p>{{ end -}}
+    {{- with $b.tags }}<div class="brand-box__tags">{{ range . }}<span class="brand-box__tag">{{ . }}</span>{{ end }}</div>{{ end -}}
+    {{- if and $b.affiliate_url .Site.Params.affiliate }}<a class="brand-box__cta" href="{{ $b.affiliate_url }}" rel="sponsored noopener">Shop {{ $b.name }} →</a>{{ end -}}
+  </div>
+</div>
+{{- else -}}
+<!-- brand-box: no data for slug "{{ $slug }}" -->
+{{- end -}}
