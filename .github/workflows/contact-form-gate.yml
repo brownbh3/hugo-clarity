@@ -1,0 +1,30 @@
+name: Contact-form gate (FIG-1 I7)
+
+# Fails the theme build if the shared contact-form partial loses its API Gateway
+# endpoint or reCAPTCHA sitekey (a merge/upgrade can silently drop the wiring → the
+# form renders but POSTs nowhere). Runs on any change to the partial or the checker.
+
+on:
+  push:
+    paths:
+      - "layouts/partials/contact-form.html"
+      - ".github/scripts/check_contact_form.py"
+      - ".github/workflows/contact-form-gate.yml"
+  pull_request:
+    paths:
+      - "layouts/partials/contact-form.html"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contact-form:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Assert contact-form wiring intact (I7)
+        run: python3 .github/scripts/check_contact_form.py
