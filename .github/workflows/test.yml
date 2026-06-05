@@ -9,7 +9,7 @@ jobs:
       matrix:
         hugo-version:
           - 'latest'
-          - '0.143.1'
+          - '0.162.1'   # fleet pin (deploy-site.yml). Was 0.143.1 — too old for hugo.Data (header.html).
     steps:
       - uses: actions/checkout@v4
 
