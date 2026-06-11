@@ -1,0 +1,28 @@
+{{- /* adsense-body — canonical theme fallback (2026-06-11, fable5 review follow-up).
+
+     Purpose: playbooks mandate {{< adsense-body >}} so a post keeps a deliberate
+     in-body ad slot — the lever for turning auto-ads OFF on a site and running
+     manual placement (or affiliates-only) without rewriting posts. Before this
+     fallback, sites without a per-site copy FAILED THE BUILD on the shortcode.
+
+     Lookup order: a site's own layouts/shortcodes/adsense-body.html (23 sites,
+     hard-coded pub+slot) overrides this file — their behavior is unchanged.
+
+     This fallback renders a unit ONLY when the site sets both params:
+       [params.adsense]  client = "ca-pub-…"  bodySlot = "1234567890"
+     Unset → renders nothing (build-safe no-op; post keeps the slot marker). */ -}}
+{{- $client := site.Params.adsense.client | default "" -}}
+{{- $slot := site.Params.adsense.bodySlot | default "" -}}
+{{- if and $client $slot -}}
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $client }}"
+     crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="{{ $client }}"
+     data-ad-slot="{{ $slot }}"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+{{- end -}}
