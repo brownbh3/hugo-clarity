@@ -1,0 +1,13 @@
+{{- define "main" }}
+<div class="wrap content">
+  <article class="post_content">
+    <h1>{{ .Title }}</h1>
+    {{- partial "privacy/base.html" . }}
+    {{- if .Params.disclose_adsense }}{{ partial "privacy/adsense.html" . }}{{ end }}
+    {{- if .Params.disclose_analytics }}{{ partial "privacy/analytics.html" . }}{{ end }}
+    {{- if .Params.disclose_affiliate }}{{ partial "privacy/affiliate.html" . }}{{ end }}
+    {{- if .Params.disclose_capture }}{{ partial "privacy/capture.html" . }}{{ end }}
+    {{- partial "privacy/base_tail.html" . }}
+  </article>
+</div>
+{{- end }}
