@@ -10,7 +10,7 @@
 {{- end }}
 <title>{{ with $title }}{{ . }} {{ $separator }} {{ end }}{{ .Site.Title }}</title>
 <meta charset="utf-8">
-{{ if .Params.noindex }}
+{{ if or .Params.noindex (in (slice "privacy-statement" "contact_us") .Layout) }}
 <meta name="robots" content="noindex" />
 {{ end }}
 {{- with $params.ga_verify }}
