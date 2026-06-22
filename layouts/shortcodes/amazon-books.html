@@ -1,0 +1,49 @@
+{{- /*
+  amazon-books shortcode (shared theme — the "Amazon universal long-tail layer")
+  Usage: {{< amazon-books category="oracle" >}}
+  Reads: data/books/<category>.yaml  (per-site)
+  Affiliate tag: site param amazonTag (config/_default/params.toml)
+
+  Each book entry supports:
+    - asin: <ASIN>           → links to https://www.amazon.com/dp/<ASIN>?tag=<TAG>
+    - search: <query>        → links to https://www.amazon.com/s?k=<query>&tag=<TAG>
+                               (Amazon resolves to current in-print edition — no ASIN needed)
+  Plus optional: title, author, year, note
+  Falls back to non-affiliate Amazon links if amazonTag is empty.
+  Renders its own FTC disclosure inline. Posts using it should still set
+  `affiliate: true` so the page-level disclosure gate (qa_check G-suite) is satisfied.
+*/ -}}
+{{- $cat := .Get "category" -}}
+{{- $data := index site.Data.books $cat -}}
+{{- /* fleet-default tag (one Associates account); per-site override via params.amazonTag */ -}}
+{{- $tag := site.Params.amazonTag | default "harmanresea0c-20" -}}
+{{- if $data -}}
+<div class="amazon-books">
+  <p class="affiliate-disclosure" data-nosnippet><em>As an Amazon Associate, Harman Research earns from qualifying purchases. The links below are affiliate links — your price is unchanged.</em></p>
+  <ul class="amazon-books-list">
+    {{- range $data.books }}
+    <li class="amazon-book">
+      {{- $url := "" -}}
+      {{- if .asin -}}
+        {{- $url = printf "https://www.amazon.com/dp/%s" .asin -}}
+        {{- if $tag -}}{{- $url = printf "%s?tag=%s" $url $tag -}}{{- end -}}
+      {{- else if .search -}}
+        {{- $q := .search | urlquery -}}
+        {{- $url = printf "https://www.amazon.com/s?k=%s" $q -}}
+        {{- if $tag -}}{{- $url = printf "%s&tag=%s" $url $tag -}}{{- end -}}
+      {{- end -}}
+      {{- if $url -}}
+      <a href="{{ $url }}" rel="nofollow sponsored" target="_blank">
+        {{- with .title }}<strong>{{ . }}</strong>{{ else }}<strong>{{ or .search .asin }}</strong>{{ end -}}
+        {{- with .author }} — {{ . }}{{ end -}}
+        {{- with .year }} ({{ . }}){{ end -}}
+      </a>
+      {{- with .note }} <span class="amazon-book-note">— {{ . }}</span>{{ end -}}
+      {{- end -}}
+    </li>
+    {{- end }}
+  </ul>
+</div>
+{{- else -}}
+<p><em>No book data available for category: {{ $cat }}</em></p>
+{{- end -}}
