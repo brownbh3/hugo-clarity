@@ -9,7 +9,8 @@
     - search: <query>        → links to https://www.amazon.com/s?k=<query>&tag=<TAG>
                                (Amazon resolves to current in-print edition — no ASIN needed)
   Plus optional: title, author, year, note
-  Falls back to non-affiliate Amazon links if amazonTag is empty.
+  If amazonTag is empty it falls back to the account tag harmanresea0c-20 (see the
+  $tag line below) — links ALWAYS carry a tag; set amazonTag for per-site attribution.
   Renders its own FTC disclosure inline. Posts using it should still set
   `affiliate: true` so the page-level disclosure gate (qa_check G-suite) is satisfied.
 */ -}}
