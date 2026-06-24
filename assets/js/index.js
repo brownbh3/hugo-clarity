@@ -321,7 +321,10 @@ function fileClosure(){
 
   (function AltImage() {
     let post = elem('.post_content');
-    let images = post ? post.querySelectorAll('img') : [];
+    // Exclude brand-box logos: their <img> is followed by .brand-box__body
+    // (name + canonical link), which the caption pass would delete as a stale
+    // caption and replace with an alt-text figcaption. Fleet Brand Data Pipeline.
+    let images = post ? post.querySelectorAll('img:not(.brand-box__logo)') : [];
     images ? populateAlt(images) : false;
 
     images.forEach((image) => image.addEventListener('load', (e) => {

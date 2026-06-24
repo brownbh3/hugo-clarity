@@ -1,27 +1,29 @@
 {{- /* brand-box — Fleet Brand Data Pipeline (v2.4, Policy Decision #11).
        Reads hugo.Data.brands[slug] (per-site brands.json, built from brands.db).
-       Uniform base + per-cluster CSS variant. logo_url null → name + description
-       only. affiliate_url + Site.Params.affiliate → "Shop X →" sponsored CTA. */ -}}
+       Uniform base + per-cluster CSS variant (host-banner layout: logo · name+
+       tagline · CTA-right). CTA = "Visit X →" to affiliate_url (sponsored, when
+       site.Params.affiliate) else the canonical url. logo_url null → no logo. */ -}}
 {{- $slug := .Get "slug" -}}
 {{- $b := index hugo.Data.brands $slug -}}
 {{- if $b -}}
 {{- if not (.Page.Scratch.Get "brandbox_css") -}}
 <style>
-.brand-box{border:1px solid #e2e2e2;border-left-width:4px;border-radius:8px;padding:1rem;margin:1.25rem 0;display:flex;gap:1rem;align-items:flex-start;font-family:system-ui,-apple-system,sans-serif}
-.brand-box__logo{flex:0 0 auto;width:64px;height:64px;object-fit:contain;background:#fafafa;border-radius:6px}
-.brand-box__body{flex:1 1 auto;min-width:0}
-.brand-box__name{font-weight:600;font-size:1.1rem;margin:0 0 .25rem}
-.brand-box__name a{text-decoration:none}
-.brand-box__fn{margin:.25rem 0;color:#333;line-height:1.45}
-.brand-box__tags{margin-top:.5rem}
-.brand-box__tag{display:inline-block;background:#f0f0f0;border-radius:999px;padding:.1rem .6rem;font-size:.75rem;margin:.1rem .25rem .1rem 0;color:#444}
-.brand-box__cta{display:inline-block;margin-top:.6rem;font-weight:600;text-decoration:none}
+.brand-box{border:1px solid #e2e2e2;border-left-width:4px;border-radius:8px;margin:1.25rem 0;display:flex;align-items:stretch;overflow:hidden;font-family:system-ui,-apple-system,sans-serif}
+.brand-box__logo{flex:0 0 150px;width:150px;margin:0;object-fit:contain;background:#fff;border-right:1px solid #eee;padding:.7rem;box-sizing:border-box}
+.brand-box__body{flex:1 1 auto;min-width:0;padding:.8rem 1rem;align-self:center}
+.brand-box__name{font-weight:700;font-size:1.05rem;margin:0 0 .2rem}
+.brand-box__name a{color:var(--theme,#2b6cb0)}
+.brand-box__fn{margin:.15rem 0;color:#575757;font-size:.85rem;line-height:1.4}
+.brand-box__tags{margin-top:.4rem}
+.brand-box__tag{display:inline-block;background:#f2f2f2;border:1px solid #dedede;border-radius:999px;padding:.1rem .55rem;font-size:.72rem;margin:.1rem .25rem .1rem 0;color:#444}
+.brand-box__cta{flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:var(--theme,#2b6cb0);color:#fff!important;font-weight:600;text-decoration:none!important;padding:0 1.25rem;white-space:nowrap}
+.brand-box__cta:hover{filter:brightness(.92);color:#fff!important}
 .brand-box--catalog_retailer{border-left-color:#2b6cb0}
 .brand-box--credit_card_issuer,.brand-box--co_branded_card{border-left-color:#6b46c1}
 .brand-box--privacy_org,.brand-box--data_broker{border-left-color:#2f855a}
 .brand-box--hosting_provider{border-left-color:#c05621}
 .brand-box--isp_broadband{border-left-color:#319795}
-@media(max-width:480px){.brand-box{flex-direction:column}}
+@media(max-width:560px){.brand-box{flex-direction:column}.brand-box__logo{flex-basis:auto;width:100%;height:72px;border-right:none;border-bottom:1px solid #eee}.brand-box__cta{padding:.65rem;width:100%}}
 </style>
 {{- .Page.Scratch.Set "brandbox_css" true -}}
 {{- end -}}
@@ -32,8 +34,12 @@
     {{- $fn := $b.function | default $b.og_description -}}
     {{- with $fn }}<p class="brand-box__fn">{{ . }}</p>{{ end -}}
     {{- with $b.tags }}<div class="brand-box__tags">{{ range . }}<span class="brand-box__tag">{{ . }}</span>{{ end }}</div>{{ end -}}
-    {{- if and $b.affiliate_url .Site.Params.affiliate }}<a class="brand-box__cta" href="{{ $b.affiliate_url }}" rel="sponsored noopener">Shop {{ $b.name }} →</a>{{ end -}}
   </div>
+  {{- /* CTA fills the right (host-banner style). affiliate_url when set + site
+         affiliate flag on → sponsored; otherwise the canonical url. */ -}}
+  {{- $useAff := and $b.affiliate_url site.Params.affiliate -}}
+  {{- $ctaHref := cond (not (not $useAff)) $b.affiliate_url $b.url -}}
+  {{- with $ctaHref }}<a class="brand-box__cta" href="{{ . }}" target="_blank" rel="{{ cond (not (not $useAff)) "sponsored noopener" "noopener" }}">Visit {{ $b.name }} →</a>{{ end -}}
 </div>
 {{- else -}}
 <!-- brand-box: no data for slug "{{ $slug }}" -->
