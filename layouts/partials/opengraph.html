@@ -67,7 +67,7 @@
 {{- with $keywords }}
   <meta name="keywords" content="{{ $keywords }}" />
 {{- end }}
-{{/* ---- author: brand/placeholder values → Organization Harman Research; only a real human name → Person ---- */}}
+{{/* ---- author: brand/placeholder values → Organization = the site itself (matches the privacy statement's operator identity — Bill 2026-07-11); only a real human name → Person ---- */}}
 {{- $authorLooksLikeBrand := or (eq $author "webmaster") (eq $author $site) (strings.Contains $author ".com") (strings.Contains $author ".info") (strings.Contains $author ".org") (strings.Contains $author ".net") (strings.Contains $author ".ws") }}
 {{- $isOrgAuthor := or (not $author) $authorLooksLikeBrand }}
 {{- if .IsHome }}
@@ -80,8 +80,8 @@
       "url": "{{ $home }}",
       "publisher": {
         "@type": "Organization",
-        "name": "Harman Research",
-        "url": "https://harmanresearch.com",
+        "name": "{{ $site }}",
+        "url": "{{ $home }}",
         "logo": {
           "@type": "ImageObject",
           "url": "{{ $logo }}"
@@ -105,8 +105,8 @@
       "dateModified": "{{ $lastModStr }}",
       "author": {{ if $isOrgAuthor }}{
         "@type": "Organization",
-        "name": "Harman Research",
-        "url": "https://harmanresearch.com"
+        "name": "{{ $site }}",
+        "url": "{{ $home }}"
       }{{ else }}{
         "@type": "Person",
         "name": "{{ $author }}"
@@ -117,8 +117,8 @@
       },
       "publisher": {
         "@type": "Organization",
-        "name": "Harman Research",
-        "url": "https://harmanresearch.com",
+        "name": "{{ $site }}",
+        "url": "{{ $home }}",
         "logo": {
           "@type": "ImageObject",
           "url": "{{ $logo }}"
