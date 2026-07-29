@@ -36,11 +36,31 @@
     {{- with $fn }}<p class="brand-box__fn">{{ . }}</p>{{ end -}}
     {{- with $b.tags }}<div class="brand-box__tags">{{ range . }}<span class="brand-box__tag">{{ . }}</span>{{ end }}</div>{{ end -}}
   </div>
-  {{- /* CTA fills the right (host-banner style). affiliate_url when set + site
-         affiliate flag on → sponsored; otherwise the canonical url. */ -}}
-  {{- $useAff := and $b.affiliate_url site.Params.affiliate -}}
-  {{- $ctaHref := cond (not (not $useAff)) $b.affiliate_url $b.url -}}
-  {{- with $ctaHref }}<a class="brand-box__cta" href="{{ . }}" target="_blank" rel="{{ cond (not (not $useAff)) "sponsored noopener" "noopener" }}">Visit {{ $b.name }} →</a>{{ end -}}
+  {{- /* CTA fills the right (host-banner style). Three sources, in order:
+
+         1. AF-1 RESOLVER — hugo.Data.affiliates[slug] (data/affiliates.json, written by
+            the resolver from org.db). Carries the per-site PID and a __SLUG__ subid
+            placeholder, so attribution is per PAGE. Preferred: brands.db never bakes a
+            per-site PID, and this is the only source that can.
+         2. brands.json `affiliate_url` — a pre-AF-1 per-record URL. Still populated on
+            bdma_org / catalogperks / catalogshop (103 records each), so it stays.
+         3. Canonical `url` — a PLAIN, non-sponsored link. This is deliberate, not a
+            fallback bug: the Boulder ISP sites (158 brand-box placements) are the
+            2026-06-18 AdSense-first pattern and must keep rendering plain links.
+
+         Restored 2026-07-28: this shortcode was edited 06-24 to drop source 1, which
+         left optout.ws and linuxhosted.com unable to emit an affiliate CTA even though
+         the resolver had written their affiliates.json. */ -}}
+  {{- $aff := false -}}
+  {{- if hugo.Data.affiliates }}{{ $aff = index hugo.Data.affiliates $slug }}{{ end -}}
+  {{- $useResolver := and $aff site.Params.affiliate -}}
+  {{- $useAff := and (not $useResolver) $b.affiliate_url site.Params.affiliate -}}
+  {{- if $useResolver -}}
+    <a class="brand-box__cta" href="{{ (replace $aff.url "__SLUG__" .Page.File.ContentBaseName) | safeURL }}" target="_blank" rel="{{ $aff.rel | default "sponsored noopener" }}">Visit {{ $b.name }} →</a>
+  {{- else -}}
+    {{- $ctaHref := cond (not (not $useAff)) $b.affiliate_url $b.url -}}
+    {{- with $ctaHref }}<a class="brand-box__cta" href="{{ . }}" target="_blank" rel="{{ cond (not (not $useAff)) "sponsored noopener" "noopener" }}">Visit {{ $b.name }} →</a>{{ end -}}
+  {{- end -}}
 </div>
 {{- else -}}
 <!-- brand-box: no data for slug "{{ $slug }}" -->
