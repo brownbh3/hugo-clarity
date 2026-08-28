@@ -11,9 +11,19 @@
      This fallback renders a unit ONLY when the site sets both params:
        [params.adsense]  client = "ca-pub-…"  bodySlot = "1234567890"
      Unset → renders nothing (build-safe no-op; post keeps the slot marker). */ -}}
+{{- /* IN-1.1.1 (2026-08-27): no ad unit on the review desk — an impression from a preview
+     host is a policy exposure, and Bill has five prior AdSense denials. review_site.py and
+     acr_desk.py build with `--environment review`; this renders nothing under it and is
+     byte-identical in every other environment.
+     ⚠ THIS GUARDS THE FALLBACK ONLY. 25 sites ship their own
+     layouts/shortcodes/adsense-body.html with the pub/slot hard-coded, and a site's own copy
+     WINS over this one — measured 2026-08-27, none of the 25 carries an environment check, so
+     the desk still emits `adsbygoogle` on all of them. Consolidating those onto this fallback
+     needs each site's IDs moved into params.adsense first (none has them today) and is its own
+     row; do not read this guard as fleet-wide coverage. */ -}}
 {{- $client := site.Params.adsense.client | default "" -}}
 {{- $slot := site.Params.adsense.bodySlot | default "" -}}
-{{- if and $client $slot -}}
+{{- if and $client $slot (ne hugo.Environment "review") -}}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $client }}"
      crossorigin="anonymous"></script>
 <ins class="adsbygoogle"

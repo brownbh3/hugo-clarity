@@ -1,3 +1,10 @@
+{{- /* IN-1.1.1 (2026-08-27): the review desk is a preview host, so analytics must not fire
+     there. review_site.py / acr_desk.py build with `--environment review`; everything below
+     is skipped under it and byte-identical in every other environment — the task's blast
+     radius requires production output be unchanged. Measured before this guard: a desk
+     render carried gtag( in 324 files. NOT gated on hugo.IsProduction, which would also
+     silence `hugo server` (development) and is a wider change than this task authorises. */ -}}
+{{- if ne hugo.Environment "review" }}
 {{- $config := site.Params }}
 {{- with $config.ga_analytics }}
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ . }}"></script>
@@ -55,3 +62,6 @@ src='https://{{ default "plausible.io" $plausible.plausibleDomain }}/js/{{ defau
 {{- with $config.umami_data_website_id }}
 <script defer src="{{ $config.umami_script_url }}" data-website-id="{{ . }}"></script>
 {{- end }}
+{{- end }}{{/* IN-1.1.1 — closes the `ne hugo.Environment "review"` guard opened at the top.
+     Every analytics provider in this file is inside it, not just GA4: a preview host that
+     silenced Google and still reported to Plausible or Matomo would be a half-fixed leak. */}}
