@@ -20,7 +20,9 @@
 {{- $tag := site.Params.amazonTag | default "harmanresea0c-20" -}}
 {{- if $data -}}
 <div class="amazon-books">
-  <p class="affiliate-disclosure" data-nosnippet><em>As an Amazon Associate, {{ site.Title }} earns from qualifying purchases. The links below are affiliate links — your price is unchanged.</em></p>
+  {{- /* Bill 2026-10-13: the bare list read as "a bunch of names" - say they are books and where the links go. */ -}}
+  <p class="amazon-books-heading"><strong>Related books recommended</strong></p>
+  <p class="affiliate-disclosure" data-nosnippet><em>Links go to Amazon. As an Amazon Associate, {{ site.Title }} earns from qualifying purchases; your price is unchanged.</em></p>
   <ul class="amazon-books-list">
     {{- range $data.books }}
     <li class="amazon-book">
@@ -34,12 +36,13 @@
         {{- if $tag -}}{{- $url = printf "%s&tag=%s" $url $tag -}}{{- end -}}
       {{- end -}}
       {{- if $url -}}
-      <a href="{{ $url }}" rel="nofollow sponsored" target="_blank">
-        {{- with .title }}<strong>{{ . }}</strong>{{ else }}<strong>{{ or .search .asin }}</strong>{{ end -}}
-        {{- with .author }} — {{ . }}{{ end -}}
-        {{- with .year }} ({{ . }}){{ end -}}
+      Book: <a href="{{ $url }}" rel="nofollow sponsored" target="_blank">
+        {{- with .title }}<strong><em>{{ . }}</em></strong>{{ else }}<strong>{{ or .search .asin }}</strong>{{ end -}}
       </a>
-      {{- with .note }} <span class="amazon-book-note">— {{ . }}</span>{{ end -}}
+      {{- with .author }}, by {{ . }}{{ end -}}
+      {{- with .year }} ({{ . }}){{ end -}}.
+      {{- with .note }} <span class="amazon-book-note">{{ . | strings.FirstUpper }}.</span>{{ end }}
+      <a href="{{ $url }}" rel="nofollow sponsored" target="_blank">(View on Amazon)</a>
       {{- end -}}
     </li>
     {{- end }}
