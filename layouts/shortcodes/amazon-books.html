@@ -20,7 +20,7 @@
 {{- $tag := site.Params.amazonTag | default "harmanresea0c-20" -}}
 {{- if $data -}}
 <div class="amazon-books">
-  <p class="affiliate-disclosure" data-nosnippet><em>As an Amazon Associate, Harman Research earns from qualifying purchases. The links below are affiliate links — your price is unchanged.</em></p>
+  <p class="affiliate-disclosure" data-nosnippet><em>As an Amazon Associate, {{ site.Title }} earns from qualifying purchases. The links below are affiliate links — your price is unchanged.</em></p>
   <ul class="amazon-books-list">
     {{- range $data.books }}
     <li class="amazon-book">
