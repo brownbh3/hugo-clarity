@@ -13,6 +13,7 @@
   <article class="post_content">
     {{- $t := .Title }}
     <h1 class="post_title">{{ $t | markdownify }}</h1>
+    {{- partial "affiliate-disclosure" . }}
     {{- partial "post-meta" . }}
     {{- with .Params.featureImage -}}
       <div class="post_featured">

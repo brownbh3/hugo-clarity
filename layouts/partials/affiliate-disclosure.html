@@ -1,0 +1,15 @@
+{{- /* FTC affiliate disclosure — shared default (FD-2a, Bill 2026-10-13).
+       Rendered under the post title by _default/single.html when the post sets
+       `affiliate: true` or lists `affiliate_hosts`. A site that ships its own
+       layouts/partials/affiliate-disclosure.html overrides this one.
+       Wording matches qa_check's disclosure detection ("Affiliate Disclosure:",
+       "this post contains affiliate links", "we may earn a commission").
+       Standard: ~/bin/portfolio/standards/ftc_disclosure.md. */ -}}
+{{- $p := .Params -}}
+{{- $hasAff := eq $p.affiliate true -}}
+{{- $hasHosts := and $p.affiliate_hosts (gt (len $p.affiliate_hosts) 0) -}}
+{{- if or $hasAff $hasHosts -}}
+<div class="affiliate-disclosure" data-nosnippet style="background:#f8f4e3;border-left:4px solid #c8a800;padding:0.75em 1em;margin:0 0 1.25em;font-size:0.70em;border-radius:3px;">
+  <strong>Affiliate Disclosure:</strong> This post contains affiliate links. {{ site.Title }} may earn a commission if you buy through them, at no extra cost to you.
+</div>
+{{- end -}}
