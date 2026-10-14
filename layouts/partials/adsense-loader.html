@@ -1,0 +1,29 @@
+{{- /* adsense-loader — the AdSense Auto Ads loader in the <head> of EVERY page type
+     (home, list, taxonomy, custom section pages, posts). TH-2.1, 2026-10-14.
+
+     Why: the only AdSense code was the in-body {{< adsense-body >}} shortcode, which runs
+     inside markdown only, so home/list pages never loaded it and AdSense never counted
+     their page views. Google's own setup instructions put this loader in the head, and
+     loading it before approval is the normal route (page views register; ads serve only
+     once the property is Ready).
+
+     Same URL, byte for byte, as the 24 per-site adsense-body shortcode copies, so a post
+     that also carries an in-body unit fetches the script once (identical async src).
+
+     Skipped when:
+       - environment is "review" (IN-1.1.1: no ad code from a preview host) or
+         "development" (no ad code from localhost);
+       - the site sets params.adsenseID — that site emits its own loader
+         (timezoneworld_info hooks/head-end.html), so this would double it;
+       - the site sets params.adsenseLoader = false (per-site opt-out);
+       - a category/tag term page lists fewer than 3 pages (thin-content exposure;
+         "Low value content" is this account's recorded denial reason). */ -}}
+{{- $client := "ca-pub-1012089347386563" -}}
+{{- $on := and (not (in (slice "review" "development") hugo.Environment)) (not site.Params.adsenseID) (ne site.Params.adsenseLoader false) -}}
+{{- if and $on (eq .Kind "term") (lt (len .Pages) 3) -}}
+  {{- $on = false -}}
+{{- end -}}
+{{- if $on }}
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $client }}"
+     crossorigin="anonymous"></script>
+{{- end -}}

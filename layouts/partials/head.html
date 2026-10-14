@@ -22,6 +22,7 @@
   {{- partialCached "analytics" . }}
 {{- end }}
 {{- partial "opengraph" . }}
+{{- partial "adsense-loader" . }}
 {{- partialCached "favicon" . }}
 <link rel="canonical" href="{{ .Permalink }}">
 {{ range .AlternativeOutputFormats -}}
