@@ -155,3 +155,9 @@ p
 picture
   display: block
   width: 100%
+
+// TH-2.6 (2026-10-16): a long unbroken word (sys.dm_tran_active_transactions, SYS.DM_PDW_NODES_...)
+// in a title, heading, paragraph, list item or tag pill pushed the page wider than a phone screen,
+// so a swipe slid the whole page sideways. Let such words break; normal text wraps as before.
+h1, h2, h3, h4, h5, h6, p, li, dd, blockquote, .post_tag
+  overflow-wrap: anywhere
