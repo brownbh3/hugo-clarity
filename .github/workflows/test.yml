@@ -6,6 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false   # one Hugo version failing must not cancel the other's result
       matrix:
         hugo-version:
           - 'latest'
@@ -18,6 +19,11 @@ jobs:
         with:
           hugo-version: ${{ matrix.hugo-version }}
           extended: true
+
+      # Newer Hugo releases need the Dart Sass binary for css.Sass (2026-11-20: 'latest' failed
+      # with "no Dart Sass binary found in $PATH"). Installed for every matrix version.
+      - name: Install Dart Sass
+        run: sudo snap install dart-sass
 
       - name: Run Hugo
         working-directory: exampleSite
