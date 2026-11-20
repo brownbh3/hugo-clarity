@@ -70,3 +70,6 @@ other = "Posts in this series"
   other = "Query is too short"
 [type_to_search]
   other = "Type to search"
+
+[toggle_dark_mode]
+  other = "Toggle dark mode"
