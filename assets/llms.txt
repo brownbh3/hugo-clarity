@@ -1,0 +1,55 @@
+{{- /*
+  /llms.txt for the site, per https://llmstxt.org: an H1 with the site name, a
+  blockquote summary, then H2 sections of "- [name](url): notes" link lists, with
+  secondary links under "## Optional". Rendered once, from the home page, by
+  partials/llms-txt.html (called in baseof.html), so a site needs no config.
+
+  Summary: the home page's description (content/_index.md), else
+  params.description, else params.introDescription; left out if none is set.
+
+  Top pages (optional): data/llms_top.yaml in the site repo, written by bin's
+  llms_top.py, shaped as
+    pages:
+      - title: "Page title"
+        url: "/post/some-slug/"
+        note: "optional one-line note"
+  Without that file the section is left out.
+
+  Turn it off for a site with params.llmsTxt = false.
+*/ -}}
+{{- $clean := `[\[\]]` -}}
+{{- $summary := or .Description site.Params.description site.Params.introDescription -}}
+# {{ site.Title }}
+{{ with $summary }}
+> {{ . | plainify | replaceRE `\s+` " " | strings.TrimSpace }}
+{{ end }}
+{{- with site.Menus.main }}
+## Sections
+
+{{ range . -}}
+- [{{ .Name | replaceRE $clean "" | replaceRE `\s+` " " | strings.TrimSpace }}]({{ .URL | absURL }}){{ with .Page }}{{ with .Description }}: {{ . | plainify | replaceRE `\s+` " " | strings.TrimSpace }}{{ end }}{{ end }}
+{{ range .Children -}}
+- [{{ .Name | replaceRE $clean "" | replaceRE `\s+` " " | strings.TrimSpace }}]({{ .URL | absURL }})
+{{ end -}}
+{{ end -}}
+{{ end -}}
+{{- with site.Data.llms_top }}{{ with .pages }}
+## Top pages
+
+{{ range . -}}
+- [{{ .title | replaceRE $clean "" | replaceRE `\s+` " " | strings.TrimSpace }}]({{ .url | absURL }}){{ with .note }}: {{ . | replaceRE `\s+` " " | strings.TrimSpace }}{{ end }}
+{{ end -}}
+{{ end }}{{ end -}}
+{{- $sections := site.Params.mainSections | default (slice "post") -}}
+{{- $posts := first 10 (where site.RegularPages "Section" "in" $sections).ByDate.Reverse -}}
+{{- $cats := site.Taxonomies.categories -}}
+{{- if or $posts $cats }}
+## Optional
+
+{{ range $posts -}}
+- [{{ .Title | replaceRE $clean "" | replaceRE `\s+` " " | strings.TrimSpace }}]({{ .Permalink }}){{ with .Description }}: {{ . | plainify | replaceRE `\s+` " " | strings.TrimSpace }}{{ end }}
+{{ end -}}
+{{ with $cats }}{{ range first 15 .ByCount -}}
+- [Category: {{ .Page.Title | replaceRE $clean "" | replaceRE `\s+` " " | strings.TrimSpace }}]({{ .Page.Permalink }})
+{{ end -}}{{ end -}}
+{{- end -}}

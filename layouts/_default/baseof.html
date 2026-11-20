@@ -19,6 +19,7 @@
 >
   <head>
     {{- partial "head" . }}
+    {{- if .IsHome }}{{ partial "llms-txt" . }}{{ end }}
     {{- partial "hooks/head-end" . }}
   </head>
   <body
