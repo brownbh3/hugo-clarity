@@ -1,0 +1,7 @@
+{{- /* Publishes /llms.txt from assets/llms.txt. Called once, on the home page, from baseof.html. */ -}}
+{{- if ne site.Params.llmsTxt false -}}
+  {{- with resources.Get "llms.txt" -}}
+    {{- $out := . | resources.ExecuteAsTemplate "llms.txt" $ -}}
+    {{- $out.Publish -}}
+  {{- end -}}
+{{- end -}}
