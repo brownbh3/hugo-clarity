@@ -770,3 +770,13 @@ figcaption
 .openstreetmap
 	border: none
 	
+
+// TH-2.7 (2026-11-20): the manual in-article ad unit reserves its height. On desktop it sits
+// above the fold, and its resize after load moved the post text: about 75% of oraclescripts'
+// lab CLS (Search Console "CLS more than 0.25, desktop"). 280px is the height the slot takes.
+// `[data-ad-slot]` matches only the manual unit (every adsense-body shortcode sets it);
+// Auto-ads slots inside .post_body carry no slot id and collapse to 0 when unfilled, so a
+// bare `ins.adsbygoogle` here would leave 280px gaps through the post.
+.post_body ins.adsbygoogle[data-ad-slot]
+  display: block
+  min-height: 280px
